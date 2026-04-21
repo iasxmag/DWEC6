@@ -1,0 +1,13 @@
+ul {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a:hover {
+    color: #0f1923;
+    text-decoration: underline;
+}
