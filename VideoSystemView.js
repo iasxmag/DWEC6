@@ -12,7 +12,8 @@ class VideoSystemView {
         this.form = document.getElementById('form');
     } 
 
-    //Funcion para mostrar el formulario de añadir producciones
+    // ----------------------FORMULARIOS----------------------
+    //AÑADIR PRODUCCIONES
     mostrarFormAdd(categorias, directores, actores) {
         //esconder otras secciones 
         this.centralCat.classList.add('d-none');
@@ -170,9 +171,52 @@ class VideoSystemView {
         }
     }
 
-    //BINDS FORMULARIO
+    //ELIMINAR PRODUCCIONS
+    mostrarFormDelete(producciones) {
+        //esconder otras secciones
+        this.centralCat.classList.add('d-none');
+        this.random.classList.add('d-none');
+        
+        //mostrar el formulario
+        this.form.classList.remove('d-none');
+        this.form.innerHTML = ""; // Limpiar el formulario antes de agregar el nuevo contenido
+
+        const listaProds = [...producciones];
+        //HTML del formulario ELIMINAR
+        const formHTML = `
+        <div class="container my-4">
+            <h1 class="display-5 mb-4">Eliminar producción</h1>
+            <form name="delete" role="form" class="bg-light p-4 rounded shadow-sm" novalidate>
+                <div class="form-group">
+                    <label class="form-label" for="selectEliminar">Selecciona la producción a eliminar</label>
+                    <select class="form-select" id="selectEliminar" name="selectEliminar" required>
+                        <option value="">Selecciona una producción</option>
+                        ${listaProds.map(prod => `<option value="${prod.title}">${prod.title}</option>`).join('')}
+                    </select>
+                    <div class="invalid-feedback">Debes seleccionar una producción para eliminar.</div>
+                    <div class="valid-feedback">Correcto.</div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" id="btnEliminar" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        `;
+
+        //insertar HTML en DOM
+        this.form.innerHTML = formHTML;
+    }
+
+
+    // MODIFICAR PRODUCCIONES
+
+
+    //------------------BINDS FORMULARIOS------------------
 
     //formulario AÑADIR
+    //click en la nav de añadir produccion
     bindNavAdd(handler) {
         const link = document.getElementById('navAdd');
         if (link) {
@@ -183,6 +227,7 @@ class VideoSystemView {
         }
     }
 
+    //submit del formulario de añadir produccion
     bindAddProduction(handler) {
         const form = document.forms['add'];
         form.addEventListener('submit', (e) => {
@@ -201,6 +246,44 @@ class VideoSystemView {
                 const selAct = document.getElementById('selectActor');
                 data.actores = Array.from(selAct.selectedOptions).map(opt =>opt.value);
              
+                handler(data);   
+            }
+        });
+    }
+
+    //formulario ELIMINAR
+    //click en el link del menu para mostrar el formulario
+    bindNavDelete(handler) {
+        const link = document.getElementById('navDel');
+        if (link) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                handler();
+            });
+        }
+    }
+
+    bindDeleteProduction(handler) {
+        const form = document.forms['delete'];
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Detener la propagación del evento 
+            e.stopPropagation();
+
+            //si el formulario no es valido 
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+            } else {
+                //si es correcto se recogen los datos y se envian
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+
+                const selProd = document.getElementById('selectEliminar');
+                if (selProd) {
+                    data.produccion = selProd.value;
+                }
+
                 handler(data);   
             }
         });

@@ -191,7 +191,11 @@ class VideoSystemController {
     }
   };
 
+  // -----------FORMULARIOS------------------
+
   //FORMULARIO DE AÑADIR
+
+  //handle para mostrar el formulario de añadir producción
   handleAddProd = () => {
     const cats = this[MODEL].categories;
     const dirs = this[MODEL].directors;
@@ -204,6 +208,7 @@ class VideoSystemController {
     this[VIEW].bindAddProduction(this.handleCreateProd);
   };
 
+  //handle para crear la producción a partir de los datos del formulario
   handleCreateProd = (datos) => {
     try {
         // Crear produccion
@@ -239,7 +244,33 @@ class VideoSystemController {
     } catch (error) {
         alert('Error: ' + error.message);
     }
-};
+  };
+
+  //FORMULARIO DE ELIMINAR
+
+  //handle para mostrar el formulario de eliminar producción
+  handleDeleteProd = () => {
+      const prods = this[MODEL].productions;
+      this[VIEW].mostrarFormDelete(prods);
+      this[VIEW].bindDeleteProduction((datos) => this.handleConfirmDelete(datos));
+  };
+
+  //handle para eliminar la producción seleccionada en el formulario
+  handleConfirmDelete = (datos) => {
+    try {
+      const tituloEliminar = datos.selectEliminar;
+      const objetoProd = [...this[MODEL].productions].find(prod => prod.title === tituloEliminar);
+
+      if (objetoProd) {
+        //llamada al metodo del modelo
+        this[MODEL].removeProduction(objetoProd);
+        alert(`Producción "${tituloEliminar}" eliminada correctamente.`);
+        this.handleInicio();
+      }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+  };
 
   onInit = () => {
     //Mostrar las categorias en el menu
@@ -270,6 +301,8 @@ class VideoSystemController {
 
     // formulario de añadir producción
     this[VIEW].bindNavAdd(this.handleAddProd);
+    // formulario de eliminar producción
+    this[VIEW].bindNavDelete(this.handleDeleteProd);
 
     // Botón "Cerrar todas las ventanas" en el menu principal
     const btnCerrar = document.getElementById('cerrarTodo');
