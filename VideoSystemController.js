@@ -191,6 +191,55 @@ class VideoSystemController {
     }
   };
 
+  //FORMULARIO DE AÑADIR
+  handleAddProd = () => {
+    const cats = this[MODEL].categories;
+    const dirs = this[MODEL].directors;
+    const acts = this[MODEL].actors;
+
+    // Llamamos a la vista
+    this[VIEW].mostrarFormAdd(cats, dirs, acts);
+    
+    // Conectamos el botón de guardar
+    this[VIEW].bindAddProduction(this.handleCreateProd);
+  };
+
+  handleCreateProd = (datos) => {
+    try {
+        // Crear produccion
+        const nuevaProd = this[MODEL].createProduction(
+            datos['crear-titulo'],          
+            new Date(datos['crear-fecha']),
+            Number(datos['crear-duracion']),
+            datos['crear-sinopsis'] || ''  
+        );
+
+        //añadir al sistema la produccion nueva
+        this[MODEL].addProduction(nuevaProd);
+
+        //asignar el director
+        const director = [...this[MODEL].directors].find(d => d.name === datos.selectDirector);
+        if (director) this[MODEL].assignDirector(director, nuevaProd);
+
+        //asignar el actor o actores
+        if (datos.actores) {
+            for (const nombreActor of datos.actores) {
+                const actor = [...this[MODEL].actors].find(a => a.name === nombreActor);
+                if (actor) this[MODEL].assignActor(actor, nuevaProd);
+            }
+        }
+
+        //asignar la categoria
+        const cat = [...this[MODEL].categories].find(c => c.name === datos.selectCategoria);
+        if (cat) this[MODEL].assignCategory(cat, nuevaProd);
+
+        alert('La producción "' + datos['crear-titulo'] + '" se ha añadido correctamente.');
+        this.handleInicio();
+
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+};
 
   onInit = () => {
     //Mostrar las categorias en el menu
@@ -218,6 +267,9 @@ class VideoSystemController {
     this[VIEW].bindOpenWindow(this.handleOpenWindow);
     this[VIEW].bindOpenWindowActor(this.handleOpenWindowActor);
     this[VIEW].bindOpenWindowDirector(this.handleOpenWindowDirector);
+
+    // formulario de añadir producción
+    this[VIEW].bindNavAdd(this.handleAddProd);
 
     // Botón "Cerrar todas las ventanas" en el menu principal
     const btnCerrar = document.getElementById('cerrarTodo');

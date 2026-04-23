@@ -1,3 +1,7 @@
+import Production from "./Production.js";
+import Resource from "./Resource.js";
+
+
 //Clase Serie
 class Serie extends Production {
 

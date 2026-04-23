@@ -1,3 +1,6 @@
+import Production from "./Production.js";
+import Resource from "./Resource.js";
+
 //Clase Movie
 class Movie extends Production {
     

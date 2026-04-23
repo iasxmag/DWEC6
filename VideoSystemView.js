@@ -9,10 +9,211 @@ class VideoSystemView {
         this.main = document.getElementById('pag-ppal');
         this.centralCat = document.getElementById('lista-categorias');
         this.random = document.getElementById('random');
+        this.form = document.getElementById('form');
     } 
+
+    //Funcion para mostrar el formulario de añadir producciones
+    mostrarFormAdd(categorias, directores, actores) {
+        //esconder otras secciones 
+        this.centralCat.classList.add('d-none');
+        this.random.classList.add('d-none');
+
+        //mostrar el formulario 
+        this.form.classList.remove('d-none');
+        this.form.innerHTML = ""; // Limpiar el formulario antes de agregar el nuevo contenido
+
+        
+        //HTML del formulario AÑADIR
+        const formHTML = `
+        <div class="container my-4">
+            <h1 class="display-5 mb-4">Añadir producción</h1>
+
+			<form name="add" role="form" class="bg-light p-4 rounded shadow-sm" novalidate>
+
+                <fieldset class="form-group">
+                    <div class="row">
+                        <legend class="col display-6">Tipo de producción</legend>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="tipo-produccion" id="tipo-pelicula" value="Movie" required>
+                                <label class="form-check-label" for="tipo-pelicula">Película</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="tipo-produccion" id="tipo-serie" value="Serie" required>
+                                <label class="form-check-label" for="tipo-serie">Serie</label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="form-group">
+                    <div class="row">
+                        <legend class="col display-6">Categorías</legend>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <label class="form-label" for="selectCategoria">Categoría</label>
+                            <select class="form-select" id="selectCategoria" name="selectCategoria" required>
+                                <option value="">Selecciona una categoría</option>
+                            </select>
+                                <div class="invalid-feedback">Debes seleccionar una categoría.</div>
+                                <div class="valid-feedback">Correcto.</div>
+                        </div>
+                    </div>
+                </div>
+
+                </fieldset>
+
+				<fieldset class="form-group">
+
+					<div class="row">
+						<legend class="col display-6">Datos de la producción</legend>
+					</div>
+
+					<div class="row">
+						<div class="col-12">
+						    <label class="form-label" for="crear-titulo">Título</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="crear-titulo" name="crear-titulo" placeholder="Título de la producción" required>
+                                <div class="invalid-feedback">El título es obligatorio.</div>
+                                <div class="valid-feedback">El título es correcto.</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="crear-fecha">Fecha de publicación</label>
+                            <div class="input-group">
+                                <input type="date" class="form-control" id="crear-fecha" name="crear-fecha" required>
+                                <div class="invalid-feedback">La fecha de publicación es obligatoria.</div>
+                                <div class="valid-feedback">Correcto.</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="crear-sinopsis">Sinopsis</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="crear-sinopsis" name="crear-sinopsis" placeholder="Sinopsis de la producción" required>
+                                <div class="invalid-feedback">La sinopsis es obligatoria.</div>
+                                <div class="valid-feedback">La sinopsis es correcta.</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="crear-duracion">Duración (min.)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="crear-duracion" name="crear-duracion" placeholder="Duración de la producción en minutos" required>
+                                <div class="invalid-feedback">La duración debe ser mayor a 0.</div>
+                                <div class="valid-feedback">La duración es correcta.</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="form-group">
+
+					<div class="row">
+						<legend class="col display-6">Directores y actores</legend>
+					</div>
+
+					<div class="row">
+						<div class="col-12">
+                            <label class="form-label" for="selectDirector">Director</label>
+                            <select class="form-select" id="selectDirector" name="selectDirector" required>
+                                <option value="">Selecciona un director</option>
+                            </select>
+                                <div class="invalid-feedback">Debes seleccionar un director.</div>
+                                <div class="valid-feedback">Correcto.</div>
+                        </div>
+                    
+                        <div class="col-12">
+                            <label class="form-label" for="selectActor">Actor</label>
+                            <select class="form-select" id="selectActor" name="selectActor" multiple size="3" required>
+                                <option value="">Selecciona actores</option>
+                            </select>
+                                <div class="invalid-feedback">Debes seleccionar al menos un actor.</div>
+                                <div class="valid-feedback">Correcto.</div>
+                        </div>
+
+                    </div>
+                </fieldset>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" id="btnCrear" class="btn btn-primary">Crear producción</button>
+                        <button type="reset" id="btnResetCrear" class="btn btn-secondary">Resetear</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        `;
+
+        //insertar HTML en DOM
+        this.form.innerHTML = formHTML;
+  
+        // Rellenar select categorías
+        const selectCategoria = document.getElementById('selectCategoria');
+        for (const categoria of categorias) {
+            selectCategoria.insertAdjacentHTML('beforeend', `<option value="${categoria.name}">${categoria.name}</option>`);
+        }
+
+        //rellenar select directores
+        const selectDirector = document.getElementById('selectDirector');
+        for (const director of directores) {
+        selectDirector.insertAdjacentHTML('beforeend', `<option value="${director.name} ${director.lastname1}">${director.name} ${director.lastname1}</option>`);
+        }
+
+        //rellenar select actores
+        const selectActor = document.getElementById('selectActor');
+        for (const actor of actores) {
+        selectActor.insertAdjacentHTML('beforeend', `<option value="${actor.name} ${actor.lastname1}">${actor.name} ${actor.lastname1}</option>`);
+        }
+    }
+
+    //BINDS FORMULARIO
+
+    //formulario AÑADIR
+    bindNavAdd(handler) {
+        const link = document.getElementById('navAdd');
+        if (link) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                handler();
+            });
+        }
+    }
+
+    bindAddProduction(handler) {
+        const form = document.forms['add'];
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Detener la propagación del evento 
+            e.stopPropagation();
+
+            //si el formulario no es valido 
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+            } else {
+                //si es correcto se recogen los datos y se envian
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+
+                const selAct = document.getElementById('selectActor');
+                data.actores = Array.from(selAct.selectedOptions).map(opt =>opt.value);
+             
+                handler(data);   
+            }
+        });
+    }
 
     //funcion para mostrar categorias en el menu y en la zona ppal
     mostrarCategorias(categorias) {
+        //Esconder otras secciones
+        this.form.classList.add('d-none');
+
+        //mostrar las categoraiss
+        this.centralCat.classList.remove('d-none');
+        this.random.classList.remove('d-none');
 
         //limpiamos la zona ppal
         this.centralCat.innerHTML = '<h2>Categorías Disponibles:</h2>';
@@ -44,6 +245,14 @@ class VideoSystemView {
 
     //funcion para mostrar producciones
     mostrarProducciones(producciones){
+         //Esconder otras secciones
+        this.form.classList.add('d-none');
+
+        //mostrar las categoraiss
+        this.centralCat.classList.remove('d-none');
+        this.random.classList.remove('d-none');
+
+
         this.random.innerHTML = '<h1 class="mb-4 fw-bold">Producciones Destacadas</h1>';
         const container = document.createElement('div');
         
@@ -66,6 +275,13 @@ class VideoSystemView {
 
     // Método para mostrar la ficha técnica de una producción
     mostrarDetalleProduccion(prod, actores, directores) {
+         //Esconder otras secciones
+        this.form.classList.add('d-none');
+
+        //mostrar las categoraiss
+        this.centralCat.classList.remove('d-none');
+        this.random.classList.remove('d-none');
+
         this.random.innerHTML = `
         <div class="p-3 border rounded-3 bg-light">
             <h2 class= "display-6 fw-bold">${prod.title}</h2>
@@ -142,9 +358,17 @@ class VideoSystemView {
         return ventana;
     }
 
+
     //FUNCIONES PARA MOSTRAR LISTA DE ACTORES Y DIRECTORES EN SUS PÁGINAS
 
     mostrarActores(actores) {
+         //Esconder otras secciones
+        this.form.classList.add('d-none');
+
+        //mostrar las categoraiss
+        this.centralCat.classList.remove('d-none');
+        this.random.classList.remove('d-none');
+
         //limpiamos la zona ppal
         this.centralCat.innerHTML = '<h2>Actores:</h2>';
         this.random.innerHTML = "";
@@ -159,6 +383,14 @@ class VideoSystemView {
     }
 
     mostrarDirectores(directores) {
+        //Esconder otras secciones
+        this.form.classList.add('d-none');
+
+        //mostrar las categoraiss
+        this.centralCat.classList.remove('d-none');
+        this.random.classList.remove('d-none');
+
+
         //limpiamos la zona ppal
         this.centralCat.innerHTML = '<h2>Directores:</h2>';
         this.random.innerHTML = "";
@@ -396,6 +628,6 @@ class VideoSystemView {
             }
         });
     }
-
 }
+
 export default VideoSystemView;
