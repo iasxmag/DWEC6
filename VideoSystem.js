@@ -369,10 +369,18 @@ const VideoSystem = (function () {
             }
             const actorProductions = this.#actors.get(actor);
             if(actorProductions) {
-            actorProductions.delete(production);
-            return actorProductions.size;
+                actorProductions.delete(production);
             }
-            return 0;
+
+            //borrar actores del cast de la produccion
+            const cast = this.#productionsCast.get(production);
+            if (cast) {
+                const actBorrar = [...cast].find(item => item.actor === actor);
+                if (actBorrar) {
+                    cast.delete(actBorrar);
+                }
+            }
+            return actorProductions ? actorProductions.size : 0;
         }
 
         //Metodos cast

@@ -211,6 +211,75 @@ class VideoSystemView {
 
 
     // MODIFICAR PRODUCCIONES
+        mostrarFormModify(producciones, actores, directores) {
+        //esconder otras secciones
+        this.centralCat.classList.add('d-none');
+        this.random.classList.add('d-none');
+        
+        //mostrar el formulario
+        this.form.classList.remove('d-none');
+        this.form.innerHTML = ""; // Limpiar el formulario antes de agregar el nuevo contenido
+
+        const listaProds = [...producciones];
+        const listaActores = [...actores];
+        const listaDirectores = [...directores];
+
+        //HTML del formulario MODIFICAR
+        const formHTML = `
+        <div class="container my-4">
+            <h1 class="display-5 mb-4">Modificar producción</h1>
+            <form name="modify" role="form" class="bg-light p-4 rounded shadow-sm" novalidate>
+                <div class="form-group">
+                    <label class="form-label" for="selectModificar">Selecciona la producción a modificar</label>
+                    <select class="form-select" id="selectModificar" name="selectModificar" required>
+                        <option value="">Selecciona una producción</option>
+                        ${listaProds.map(prod => `<option value="${prod.title}">${prod.title}</option>`).join('')}
+                    </select>
+                    <div class="invalid-feedback">Debes seleccionar una producción para modificar.</div>
+                    <div class="valid-feedback">Correcto.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="actorModificar">Selecciona el actor/los actores al que deseas cambiar</label>
+                    <select class="form-select" id="actorModificar" name="actores" multiple size="8">
+                    ${listaActores.map(a => `<option value="${a.name} ${a.lastname1}">${a.name} ${a.lastname1}</option>`).join('')}
+                </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="directorModificar">Selecciona el director al que deseas cambiar</label>
+                    <select class="form-select" id="directorModificar" name="directorModificar" required>
+                        <option value="">Selecciona un director</option>
+                        ${listaDirectores.map(d => `<option value="${d.name} ${d.lastname1}">${d.name} ${d.lastname1}</option>`).join('')}
+                    </select>
+                    <div class="invalid-feedback">Debes seleccionar un director para modificar.</div>
+                    <div class="valid-feedback">Correcto.</div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" id="btnModificar" class="btn btn-warning">Modificar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        `;
+        
+        //insertar HTML en DOM
+        this.form.innerHTML = formHTML;
+
+        //rellenar select directores
+        const selectDirector = document.getElementById('directorModificar');
+        for (const director of directores) {
+        selectDirector.insertAdjacentHTML('beforeend', `<option value="${director.name} ${director.lastname1}">${director.name} ${director.lastname1}</option>`);
+        }
+
+        //rellenar select actores
+        const selectActor = document.getElementById('actorModificar');
+        for (const actor of actores) {
+        selectActor.insertAdjacentHTML('beforeend', `<option value="${actor.name} ${actor.lastname1}">${actor.name} ${actor.lastname1}</option>`);
+        }
+    }
 
 
     //------------------BINDS FORMULARIOS------------------
@@ -284,6 +353,42 @@ class VideoSystemView {
                     data.produccion = selProd.value;
                 }
 
+                handler(data);   
+            }
+        });
+    }
+
+    //formulario MODIFICAR
+    //click en la nav de modificar produccion
+    bindNavModify(handler) {
+        const link = document.getElementById('navMod');
+        if (link) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                handler();
+            });
+        }
+    }
+
+    //submit del formulario de modificar produccion
+    bindModifyProduction(handler) {
+        const form = document.forms['modify'];
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Detener la propagación del evento 
+            e.stopPropagation();
+
+            //si el formulario no es valido 
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+            } else {
+                //si es correcto se recogen los datos y se envian
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+
+                const selAct = document.getElementById('actorModificar');
+                data.actores = Array.from(selAct.selectedOptions).map(opt =>opt.value);
+                
                 handler(data);   
             }
         });

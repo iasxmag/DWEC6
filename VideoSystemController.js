@@ -272,6 +272,75 @@ class VideoSystemController {
     }
   };
 
+  //Formulario MODIFICAR
+  handleModifyProd = () => {
+    const prods = this[MODEL].productions;
+    const actores = this[MODEL].actors;
+    const directores = this[MODEL].directors;
+
+      this[VIEW].mostrarFormModify(prods, actores, directores);
+      this[VIEW].bindModifyProduction((datos) => this.handleConfirmModify(datos));
+  };
+
+  handleConfirmModify = (datos) => {
+    try {
+      const tituloModificar = datos.selectModificar;
+      const objetoProd = [...this[MODEL].productions].find(prod => prod.title === tituloModificar);
+      
+      //primero hay que desasignar los que ya tenía para poner los nuevos
+      const castActual = [...this[MODEL].getCast(objetoProd)];
+      
+      for (const item of castActual) {
+        this[MODEL].deassignActor(item.actor, objetoProd);
+      }
+
+      //asignar el nuevo reparto
+      if (datos.actores) {
+        const actoresSeleccionados = Array.isArray(datos.actores) ? datos.actores : [datos.actores];
+        for (const nombreCompleto of actoresSeleccionados) {
+          // Buscamos el objeto actor que coincida con ese nombre
+          const actorObj = [...this[MODEL].actors].find(a => `${a.name} ${a.lastname1}` === nombreCompleto);
+          if (actorObj) {
+              // Lo asignamos a la producción
+              this[MODEL].assignActor(actorObj, objetoProd);
+          }
+        }
+      }
+
+      //directores
+      let directorActual = null;
+
+      for (const dir of this[MODEL].directors) {
+        const prodsDir = [...this[MODEL].getProductionsDirector(dir)];
+        
+        if (prodsDir.includes(objetoProd)) {
+          directorActual = dir;
+          break;
+        }
+      }
+      
+      if (directorActual) {
+        this[MODEL].deassignDirector(directorActual, objetoProd);
+      }
+
+      //asignar el nuevo director
+      if (datos.directorModificar) {
+        const directorObj = [...this[MODEL].directors].find(d => `${d.name} ${d.lastname1}` === datos.directorModificar);
+        if (directorObj) {
+            this[MODEL].assignDirector(directorObj, objetoProd);
+        }
+      }
+      alert(`La producción "${objetoProd.title}" ha sido actualizada con éxito.`);
+      this.handleInicio(); 
+
+  } catch (error) {
+      alert('Error: ' + error.message);
+  }
+};
+
+
+
+
   onInit = () => {
     //Mostrar las categorias en el menu
     this[VIEW].mostrarCategorias(this[MODEL].categories);
@@ -303,6 +372,8 @@ class VideoSystemController {
     this[VIEW].bindNavAdd(this.handleAddProd);
     // formulario de eliminar producción
     this[VIEW].bindNavDelete(this.handleDeleteProd);
+    // formulario de modificar produccion
+    this[VIEW].bindNavModify(this.handleModifyProd);
 
     // Botón "Cerrar todas las ventanas" en el menu principal
     const btnCerrar = document.getElementById('cerrarTodo');
